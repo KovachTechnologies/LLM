@@ -4,8 +4,8 @@ import json
 import asyncio
 from typing import List
 
-#import pdfplumber
-#import docx
+import pdfplumber
+import docx
 from fastapi import FastAPI, File, UploadFile, Form, Request, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
