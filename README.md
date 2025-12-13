@@ -266,8 +266,38 @@ curl -X GET http://0.0.0.0:8002/v1/models
 ```
 
 ### 3.1.4 Qwen3 Coder 30b
+Create a script to serve the model with vllm:
+
 ```bash
-hf download Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 ~/models/qwen3-coder-30b-instruct
+touch models/run_qwen3-coder-30b-instruct.sh 
+chmod 777 models/run_qwen3-coder-30b-instruct.sh 
+```
+
+Paste the following content into `models/run_qwen3-30b-instruct.sh`.
+- Note that if we are running models concurrently, the port numbers must be distinct.
+- Note that model name must match that of huggingface (in the `hf download` step)
+
+```bash
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
+python3 -m vllm.entrypoints.openai.api_server \
+    --model Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 \
+    --dtype auto \
+    --tensor-parallel-size 2 \
+    --max-model-len 32768 \
+    --port 8004
+```
+
+Run the code
+
+```bash
+cd ~/models
+./run_qwen3-coder-30b-instruct.sh
+```
+
+Query with curl.  Note that the port number must match the above.
+
+```bash
+curl -X GET http://0.0.0.0:8004/v1/models
 ```
 
 ### 3.1.5 Qwen3 30b
@@ -289,7 +319,7 @@ python3 -m vllm.entrypoints.openai.api_server \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
-    --port 8003
+    --port 8005
 ```
 
 Run the code
@@ -302,7 +332,7 @@ cd ~/models
 Query with curl.  Note that the port number must match the above.
 
 ```bash
-curl -X GET http://0.0.0.0:8003/v1/models
+curl -X GET http://0.0.0.0:8005/v1/models
 ```
 
 ### 2.1.6 GPT-OSS 20b
@@ -328,7 +358,7 @@ python3 -m vllm.entrypoints.openai.api_server \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
-    --port 8004
+    --port 8006
 ```
 
 Run the code
@@ -341,7 +371,7 @@ cd ~/models
 Query with curl.  Note that the port number must match the above.
 
 ```bash
-curl -X GET http://0.0.0.0:8004/v1/models
+curl -X GET http://0.0.0.0:8006/v1/models
 ```
 
 # Web Application

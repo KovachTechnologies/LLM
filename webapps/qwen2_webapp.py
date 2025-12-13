@@ -1,4 +1,4 @@
-# llama31_webapp.py
+# qwen2_webapp.py
 import os
 import json
 import asyncio
@@ -15,8 +15,8 @@ import httpx
 # ----------------------------------------------------------------------
 # CONFIG
 # ----------------------------------------------------------------------
-VLLM_URL   = "http://localhost:8001/v1"
-MODEL_NAME = "meta-llama/Meta-Llama-3.1-8B-Instruct"   # <-- from curl /v1/models
+VLLM_URL   = "http://localhost:8002/v1"
+MODEL_NAME = "Qwen/Qwen2-72B-Instruct"   # <-- from curl /v1/models
 PORT       = 5001
 
 # ----------------------------------------------------------------------
@@ -224,4 +224,4 @@ input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) {
 # ----------------------------------------------------------------------
 # Run
 # ----------------------------------------------------------------------
-# uvicorn llama31_webapp:app --host 0.0.0.0 --port 5001
+# uvicorn tinyllama_webapp:app --host 0.0.0.0 --port 5001
