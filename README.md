@@ -284,7 +284,7 @@ python3 -m vllm.entrypoints.openai.api_server \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
-    --port 8004
+    --port 8003
 ```
 
 Run the code
@@ -297,7 +297,7 @@ cd ~/models
 Query with curl.  Note that the port number must match the above.
 
 ```bash
-curl -X GET http://0.0.0.0:8004/v1/models
+curl -X GET http://0.0.0.0:8003/v1/models
 ```
 
 ### 3.1.5 Qwen3 30b
@@ -319,7 +319,7 @@ python3 -m vllm.entrypoints.openai.api_server \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
-    --port 8005
+    --port 8004
 ```
 
 Run the code
@@ -332,7 +332,7 @@ cd ~/models
 Query with curl.  Note that the port number must match the above.
 
 ```bash
-curl -X GET http://0.0.0.0:8005/v1/models
+curl -X GET http://0.0.0.0:8004/v1/models
 ```
 
 ### 2.1.6 GPT-OSS 20b
@@ -358,7 +358,7 @@ python3 -m vllm.entrypoints.openai.api_server \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
-    --port 8006
+    --port 8005
 ```
 
 Run the code
@@ -371,7 +371,7 @@ cd ~/models
 Query with curl.  Note that the port number must match the above.
 
 ```bash
-curl -X GET http://0.0.0.0:8006/v1/models
+curl -X GET http://0.0.0.0:8005/v1/models
 ```
 
 # Web Application

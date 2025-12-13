@@ -1,4 +1,4 @@
-# qwen2_webapp.py
+# gptoss20b_webapp.py
 import os
 import json
 import asyncio
@@ -15,8 +15,8 @@ import httpx
 # ----------------------------------------------------------------------
 # CONFIG
 # ----------------------------------------------------------------------
-VLLM_URL   = "http://localhost:8002/v1"
-MODEL_NAME = "Qwen/Qwen2-72B-Instruct"   # <-- from curl /v1/models
+VLLM_URL   = "http://localhost:8005/v1"
+MODEL_NAME = "openai/gpt-oss-20b"   # <-- from curl /v1/models
 PORT       = 5001
 
 # ----------------------------------------------------------------------
@@ -224,4 +224,4 @@ input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) {
 # ----------------------------------------------------------------------
 # Run
 # ----------------------------------------------------------------------
-# uvicorn qwen2_webapp:app --host 0.0.0.0 --port 5001
+# uvicorn gptoss20b_webapp:app --host 0.0.0.0 --port 5001
