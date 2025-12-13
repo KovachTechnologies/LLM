@@ -116,6 +116,14 @@ uv tool install "huggingface_hub" --force
 
 ## 2.1 Download Models
 
+Login with token
+
+```bash
+hf auth login
+```
+
+The prompts will ask you for the token
+
 ### 2.1.1 Tinyllama
 ```
 hf download TinyLlama/TinyLlama-1.1B-Chat-v1.0 --local-dir ~/models/TinyLlama-1.1B-Chat-v1.0
