@@ -141,17 +141,17 @@ hf download Qwen/Qwen2-72B-Instruct --local-dir ~/models/qwen2-72b-instruct
 
 ### 2.1.4 Qwen3 Coder 30b
 ```bash
-hf download Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 ~/models/qwen3-coder-30b-instruct
+hf download Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 --local-dir ~/models/qwen3-coder-30b-instruct
 ```
 
 ### 2.1.5 Qwen3 30b
 ```bash
-hf download Qwen/Qwen3-30B-A3B-Instruct-2507 ~/models/qwen3-30b-instruct
+hf download Qwen/Qwen3-30B-A3B-Instruct-2507 --local-dir ~/models/qwen3-30b-instruct
 ```
 
 ### 2.1.6 GPT-OSS 20b
 ```bash
-hf download openai/gpt-oss-20b ~/models/openai-gptoss-20b
+hf download openai/gpt-oss-20b --local-dir ~/models/openai-gptoss-20b
 ```
 
 # 3 Serving Content
