@@ -1,4 +1,4 @@
-# llama3b_webapp.py
+# tinyllama_webapp.py
 import os
 import json
 import asyncio
@@ -16,7 +16,7 @@ import httpx
 # CONFIG
 # ----------------------------------------------------------------------
 VLLM_URL   = "http://localhost:8000/v1"
-MODEL_NAME = "/home/daniel/models/llama-3.1-8b-instruct"   # <-- from curl /v1/models
+MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"   # <-- from curl /v1/models
 PORT       = 5001
 
 # ----------------------------------------------------------------------
@@ -224,4 +224,4 @@ input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) {
 # ----------------------------------------------------------------------
 # Run
 # ----------------------------------------------------------------------
-# uvicorn llama3b_webapp:app --host 0.0.0.0 --port 5001
+# uvicorn tinyllama_webapp:app --host 0.0.0.0 --port 5001

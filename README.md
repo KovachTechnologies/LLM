@@ -70,6 +70,10 @@ vllm
 vllm[openai]
 pdfplumber
 docx
+python-docx 
+fastapi 
+uvicorn 
+httpx
 ```
 
 run pip install
@@ -114,12 +118,7 @@ uv tool install "huggingface_hub" --force
 
 ### 2.1.1 Tinyllama
 ```
-mkdir ~/models/tinyllama-1.1b
-cd ~/models/tinyllama-1.1b
-wget https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0/resolve/main/config.json
-wget https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0/resolve/main/tokenizer.json
-wget https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0/resolve/main/tokenizer.model
-wget https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0/resolve/main/model.safetensors
+hf download TinyLlama/TinyLlama-1.1B-Chat-v1.0 --local-dir ~/models/TinyLlama-1.1B-Chat-v1.0
 ```
 
 ### 2.1.2 Llama 3.1b
@@ -149,12 +148,14 @@ touch models/run_tinyllama.sh
 chmod 777 models/run_tinyllama.sh
 ```
 
-Paste the following content into `models/run_tinyllama.sh`.  Note that if we are running models concurrently, the port numbers must be distinct.
+Paste the following content into `models/run_tinyllama.sh`.  
+- Note that if we are running models concurrently, the port numbers must be distinct.
+- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
 python3 -m vllm.entrypoints.openai.api_server \
-    --model tinyllama-1.1b \
+    --model TinyLlama/TinyLlama-1.1B-Chat-v1.0 \ 
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
@@ -183,12 +184,14 @@ touch models/run_llama-3.1-8b.sh
 chmod 777 models/run_llama-3.1-8b.sh 
 ```
 
-Paste the following content into `models/run_llama-3.1-8b.sh`.  Note that if we are running models concurrently, the port numbers must be distinct.
+Paste the following content into `models/run_llama-3.1-8b.sh`.
+- Note that if we are running models concurrently, the port numbers must be distinct.
+- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
 python3 -m vllm.entrypoints.openai.api_server \
-    --model llama-3.1-8b-instruct  \
+    --model meta-llama/Meta-Llama-3.1-8B-Instruct \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
@@ -223,6 +226,4 @@ curl -X GET http://0.0.0.0:8001/v1/models
 
 ## Write Web Applications
 
-```python
-```
-
+See web applications in the `webapps` directory.
