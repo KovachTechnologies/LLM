@@ -158,6 +158,20 @@ hf download openai/gpt-oss-20b --local-dir ~/models/openai-gptoss-20b
 
 ## 3.1 Running Models with vLLM
 
+Some notes on running models:
+- By default vllm wants to download the models from huggingface
+- When downloading from hugging face, ensure the name matches *exactly* e.g. `Qwen/Qwen2-72B-Instruct`
+- To run a local model, use `--model /path/to/model` and include the `--trust-remote-code` switch
+- If we are running multiple models concurrently, use different ports (in the `--port` parameter)
+
+Explanation of arguments used:
+- `--model` - file path location of the model (locally) or huggingface model name (it will download it automatically into the `.cached` directory).
+- `--trust-remote-code` - allows execution of custom Python code from a Hugging Face model repository during model loading
+- `--enforce-eager` - disables CUDA graph and loads the model quickly, which can provide faster feedback for debugging
+- `--dtype` - controls the precision of the weights, e.g. float16, float32.  The `auto` specification lets vllm choose the best precision based on the model, gpu, etc.
+- `--max-model-len` - determines the maximum number of tokens that can be included in the input prompt or context. If the input exceeds this limit, vLLM will either truncate the input or throw an error
+- `--port` - port to serve the model on.  Ensure these are different if running concurrent models.
+
 ### 3.1.1 TinyLlama
 
 Create a script to serve the model with vllm:
@@ -168,8 +182,6 @@ chmod 777 models/run_tinyllama.sh
 ```
 
 Paste the following content into `models/run_tinyllama.sh`.  
-- Note that if we are running models concurrently, the port numbers must be distinct.
-- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export OMP_NUM_THREADS=10
@@ -207,8 +219,6 @@ chmod 777 models/run_llama-3.1-8b.sh
 ```
 
 Paste the following content into `models/run_llama-3.1-8b.sh`.
-- Note that if we are running models concurrently, the port numbers must be distinct.
-- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export OMP_NUM_THREADS=10
@@ -245,8 +255,6 @@ chmod 777 models/run_qwen2-72b.sh
 ```
 
 Paste the following content into `models/run_qwen2-72b.sh`.
-- Note that if we are running models concurrently, the port numbers must be distinct.
-- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
@@ -280,8 +288,6 @@ chmod 777 models/run_qwen3-coder-30b-instruct.sh
 ```
 
 Paste the following content into `models/run_qwen3-30b-instruct.sh`.
-- Note that if we are running models concurrently, the port numbers must be distinct.
-- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
@@ -315,8 +321,6 @@ chmod 777 models/run_qwen3-30b-instruct.sh
 ```
 
 Paste the following content into `models/run_qwen3-30b-instruct.sh`.
-- Note that if we are running models concurrently, the port numbers must be distinct.
-- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
@@ -354,8 +358,6 @@ chmod 777 models/run_openai-gptoss-20b.sh
 ```
 
 Paste the following content into `models/run_openai-gptoss-20b.sh`.
-- Note that if we are running models concurrently, the port numbers must be distinct.
-- Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
 export OMP_NUM_THREADS=10
