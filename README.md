@@ -172,9 +172,12 @@ Paste the following content into `models/run_tinyllama.sh`.
 - Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
-export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
+export OMP_NUM_THREADS=10
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 python3 -m vllm.entrypoints.openai.api_server \
-    --model TinyLlama/TinyLlama-1.1B-Chat-v1.0 \ 
+    --model /home/daniel/models/TinyLlama-1.1B-Chat-v1.0 \
+    --trust-remote-code \
+    --enforce-eager \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
@@ -208,9 +211,12 @@ Paste the following content into `models/run_llama-3.1-8b.sh`.
 - Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
-export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
+export OMP_NUM_THREADS=10
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 python3 -m vllm.entrypoints.openai.api_server \
-    --model meta-llama/Meta-Llama-3.1-8B-Instruct \
+    --model /home/daniel/models/llama-3.1-8b-instruct \
+    --trust-remote-code \
+    --enforce-eager \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
@@ -352,9 +358,12 @@ Paste the following content into `models/run_openai-gptoss-20b.sh`.
 - Note that model name must match that of huggingface (in the `hf download` step)
 
 ```bash
+export OMP_NUM_THREADS=10
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
 python3 -m vllm.entrypoints.openai.api_server \
-    --model openai/gpt-oss-20b \
+    --model /home/daniel/models/openai-gptoss-20b \
+    --trust-remote-code \
+    --enforce-eager \
     --dtype auto \
     --tensor-parallel-size 2 \
     --max-model-len 32768 \
