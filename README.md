@@ -126,8 +126,10 @@ hf download TinyLlama/TinyLlama-1.1B-Chat-v1.0 --local-dir ~/models/TinyLlama-1.
 hf download meta-llama/Meta-Llama-3.1-8B-Instruct --local-dir ~/models/llama-3.1-8b-instruct
 ```
 
-### 2.1.3 Qwen2
-(todo)
+### 2.1.3 Qwen2 72b
+```bash
+hf download Qwen/Qwen2-72B-Instruct --local-dir ~/models/qwen2-72b-instruct
+```
 
 ### 2.1.4 Qwen 20b
 (todo)
@@ -211,10 +213,42 @@ Query with curl.  Note that the port number must match the above.
 curl -X GET http://0.0.0.0:8001/v1/models
 ```
 
+### 3.1.3 Qwen2 72b
+Create a script to serve the model with vllm:
+
+```bash
+touch models/run_qwen2-72b.sh 
+chmod 777 models/run_qwen2-72b.sh 
+```
+
+Paste the following content into `models/run_qwen2-72b.sh`.
+- Note that if we are running models concurrently, the port numbers must be distinct.
+- Note that model name must match that of huggingface (in the `hf download` step)
+
+```bash
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
+python3 -m vllm.entrypoints.openai.api_server \
+    --model Qwen/Qwen2-72B-Instruct \
+    --dtype auto \
+    --tensor-parallel-size 2 \
+    --max-model-len 32768 \
+    --port 8002
+```
+
+Run the code
+
+```bash
+cd ~/models
+./run_qwen2-72b.sh
+```
+
+Query with curl.  Note that the port number must match the above.
+
+```bash
+curl -X GET http://0.0.0.0:8001/v1/models
+```
 
 
-### 3.1.3 Qwen2
-(todo)
 
 ### 3.1.4 Qwen 20b
 (todo)
