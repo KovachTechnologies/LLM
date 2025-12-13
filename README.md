@@ -139,11 +139,20 @@ hf download meta-llama/Meta-Llama-3.1-8B-Instruct --local-dir ~/models/llama-3.1
 hf download Qwen/Qwen2-72B-Instruct --local-dir ~/models/qwen2-72b-instruct
 ```
 
-### 2.1.4 Qwen 20b
-(todo)
+### 2.1.4 Qwen3 Coder 30b
+```bash
+hf download Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 ~/models/qwen3-coder-30b-instruct
+```
 
-### 2.1.5 GPT-OSS
-(todo)
+### 2.1.5 Qwen3 30b
+```bash
+hf download Qwen/Qwen3-30B-A3B-Instruct-2507 ~/models/qwen3-30b-instruct
+```
+
+### 2.1.6 GPT-OSS 20b
+```bash
+hf download openai/gpt-oss-20b ~/models/openai-gptoss-20b
+```
 
 # 3 Serving Content
 
@@ -253,16 +262,87 @@ cd ~/models
 Query with curl.  Note that the port number must match the above.
 
 ```bash
-curl -X GET http://0.0.0.0:8001/v1/models
+curl -X GET http://0.0.0.0:8002/v1/models
 ```
 
+### 3.1.4 Qwen3 Coder 30b
+```bash
+hf download Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 ~/models/qwen3-coder-30b-instruct
+```
 
+### 3.1.5 Qwen3 30b
+Create a script to serve the model with vllm:
 
-### 3.1.4 Qwen 20b
-(todo)
+```bash
+touch models/run_qwen3-30b-instruct.sh 
+chmod 777 models/run_qwen3-30b-instruct.sh 
+```
 
-### 3.1.5 GPT-OSS
-(todo)
+Paste the following content into `models/run_qwen3-30b-instruct.sh`.
+- Note that if we are running models concurrently, the port numbers must be distinct.
+- Note that model name must match that of huggingface (in the `hf download` step)
+
+```bash
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
+python3 -m vllm.entrypoints.openai.api_server \
+    --model Qwen/Qwen3-30B-A3B-Instruct-2507 \
+    --dtype auto \
+    --tensor-parallel-size 2 \
+    --max-model-len 32768 \
+    --port 8003
+```
+
+Run the code
+
+```bash
+cd ~/models
+./run_qwen3-30b-instruct.sh
+```
+
+Query with curl.  Note that the port number must match the above.
+
+```bash
+curl -X GET http://0.0.0.0:8003/v1/models
+```
+
+### 2.1.6 GPT-OSS 20b
+```bash
+hf download openai/gpt-oss-20b ~/models/openai-gptoss-20b
+```
+
+Create a script to serve the model with vllm:
+
+```bash
+touch models/run_openai-gptoss-20b.sh 
+chmod 777 models/run_openai-gptoss-20b.sh 
+```
+
+Paste the following content into `models/run_openai-gptoss-20b.sh`.
+- Note that if we are running models concurrently, the port numbers must be distinct.
+- Note that model name must match that of huggingface (in the `hf download` step)
+
+```bash
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1      # averts 'max size' error
+python3 -m vllm.entrypoints.openai.api_server \
+    --model openai/gpt-oss-20b \
+    --dtype auto \
+    --tensor-parallel-size 2 \
+    --max-model-len 32768 \
+    --port 8004
+```
+
+Run the code
+
+```bash
+cd ~/models
+./run_openai-gptoss-20b.sh
+```
+
+Query with curl.  Note that the port number must match the above.
+
+```bash
+curl -X GET http://0.0.0.0:8004/v1/models
+```
 
 # Web Application
 
