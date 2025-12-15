@@ -154,6 +154,17 @@ hf download Qwen/Qwen3-30B-A3B-Instruct-2507 --local-dir ~/models/qwen3-30b-inst
 hf download openai/gpt-oss-20b --local-dir ~/models/openai-gptoss-20b
 ```
 
+### 2.1.7 Qwen3 30b 8bit
+```bash
+hf donwload Qwen/Qwen3-30B-A3B-FP8 ~/models/qwen3-30b-fp8
+```
+
+### 2.1.8 Qwen3 
+
+```bash
+hf donwload Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 ~/models/qwen3-coder-30b-fp8
+```
+
 # 3 Serving Content
 
 ## 3.1 Running Models with vLLM
