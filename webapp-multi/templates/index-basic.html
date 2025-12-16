@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LLM Chat</title>
+    <style>
+        #chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+        #input { width: 80%; }
+        button { width: 18%; }
+    </style>
+</head>
+<body>
+    <h1>Select Model and Chat</h1>
+    <select id="model">
+        {% for m in models %}
+        <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+    </select>
+    <div id="chat"></div>
+    <input id="input" type="text" placeholder="Type message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        let messages = [];
+        const chatDiv = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const modelSelect = document.getElementById('model');
+
+        async function sendMessage() {
+            const msg = input.value;
+            if (!msg) return;
+            input.value = '';
+            appendMessage('You: ' + msg);
+
+            messages.push({ role: 'user', content: msg });
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: modelSelect.value, messages })
+            });
+
+            const reader = response.body.getReader();
+            let aiResponse = 'AI: ';
+            appendMessage(aiResponse);  // Placeholder
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const text = new TextDecoder().decode(value);
+                aiResponse += text;
+                updateLastMessage(aiResponse);
+            }
+            messages.push({ role: 'assistant', content: aiResponse.slice(4) });  // Strip 'AI: '
+        }
+
+        function appendMessage(text) {
+            const p = document.createElement('p');
+            p.textContent = text;
+            chatDiv.appendChild(p);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+
+        function updateLastMessage(text) {
+            chatDiv.lastChild.textContent = text;
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+
+        input.addEventListener('keyup', (e) => { if (e.key === 'Enter') sendMessage(); });
+    </script>
+</body>
+</html>
