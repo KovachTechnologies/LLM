@@ -34,9 +34,9 @@ MODELS = {
     },
     GPTOSS20B: {
         "path": gptoss20b_path,
-        "port": 8002,
+        "port": 8005,
         "script" : "/home/daniel/models/run_openai-gptoss-20b.sh",
-        "vllm_args": ["--model", gptoss20b_path, "--port", "8002", "--quantization", "awq", "--tensor-parallel-size", "2"]  # Large, both GPUs, quantized
+        "vllm_args": ["--model", gptoss20b_path, "--port", "8005", "--quantization", "awq", "--tensor-parallel-size", "2"]  # Large, both GPUs, quantized
     }
 }
 

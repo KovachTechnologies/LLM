@@ -43,9 +43,9 @@ MODELS = {
     },
     GPTOSS20B: {
         "path": gptoss20b_path,
-        "port": 8002,
+        "port": 8005,
         "script" : "/home/daniel/models/run_openai-gptoss-20b.sh",
-        "vllm_args": ["--model", gptoss20b_path, "--port", "8002", "--quantization", "awq", "--tensor-parallel-size", "2"]  # Large, both GPUs, quantized
+        "vllm_args": ["--model", gptoss20b_path, "--port", "8005", "--quantization", "awq", "--tensor-parallel-size", "2"]  # Large, both GPUs, quantized
     }
 }
 
@@ -89,6 +89,7 @@ def start_vllm(model_name: str):
     # Start vLLM server
     #cmd = ["python3", "-m", "vllm.entrypoints.openai.api_server"] + config["vllm_args"]
     cmd = ["bash", config["script"]]
+    print( " ".join( cmd ) )
     vllm_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     current_model = model_name
 
