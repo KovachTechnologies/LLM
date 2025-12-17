@@ -29,11 +29,11 @@ LLAMA31B = "llama3-1b"
 GPTOSS20B = "gptoss-20b"
 
 MODELS = {
-    TINYLLAMA: {
-        "path": tinyllama_path,
-        "port": 8000,
-        "script" : "/home/daniel/models/run_tinyllama.sh",
-        "vllm_args": ["--model", tinyllama_path, "--port", "8000", "--dtype", "auto", "--tensor-parallel-size", "1", "--max-model-len", "32768"]  # Small, one GPU
+    GPTOSS20B: {
+        "path": gptoss20b_path,
+        "port": 8005,
+        "script" : "/home/daniel/models/run_openai-gptoss-20b.sh",
+        "vllm_args": ["--model", gptoss20b_path, "--port", "8005", "--quantization", "awq", "--tensor-parallel-size", "2"]  # Large, both GPUs, quantized
     },
     LLAMA31B: {
         "path": llama31b_path,
@@ -41,11 +41,11 @@ MODELS = {
         "script" : "/home/daniel/models/run_llama-3.1-8b.sh",
         "vllm_args": ["--model", llama31b_path, "--port", "8001", "--dtype", "auto", "--tensor-parallel-size", "1", "--max-model-len", "32768"]
     },
-    GPTOSS20B: {
-        "path": gptoss20b_path,
-        "port": 8005,
-        "script" : "/home/daniel/models/run_openai-gptoss-20b.sh",
-        "vllm_args": ["--model", gptoss20b_path, "--port", "8005", "--quantization", "awq", "--tensor-parallel-size", "2"]  # Large, both GPUs, quantized
+    TINYLLAMA: {
+        "path": tinyllama_path,
+        "port": 8000,
+        "script" : "/home/daniel/models/run_tinyllama.sh",
+        "vllm_args": ["--model", tinyllama_path, "--port", "8000", "--dtype", "auto", "--tensor-parallel-size", "1", "--max-model-len", "32768"]  # Small, one GPU
     }
 }
 
@@ -72,14 +72,21 @@ def do_curl( port ) :
     return True
 
 def start_vllm(model_name: str):
-    global vllm_process, current_model
+    global vllm_process, current_model, vllm_pid
     if current_model == model_name and vllm_process and vllm_process.poll() is None:
         return  # Already running
 
     # Kill existing if any
     if vllm_process:
+        print( f"--> Killing process {vllm_pid}" )
         vllm_process.terminate()
         vllm_process.wait()
+        time.sleep(1)
+        kill_string = f"nvidia-smi --query-compute-apps=pid | while read line; do if [ $line != 'pid' ]; then kill -9 $line; fi; done"
+        print( kill_string )
+        os.system( kill_string )
+        time.sleep(1)
+
 
     config = MODELS.get(model_name)
     port = config[ "port" ]
@@ -89,8 +96,11 @@ def start_vllm(model_name: str):
     # Start vLLM server
     #cmd = ["python3", "-m", "vllm.entrypoints.openai.api_server"] + config["vllm_args"]
     cmd = ["bash", config["script"]]
+    print( "--> Starting process" )
     print( " ".join( cmd ) )
     vllm_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    vllm_pid = vllm_process.pid
+    print( f"--> pid: {vllm_pid}" )
     current_model = model_name
 
     # Wait for server to start (poll health)
