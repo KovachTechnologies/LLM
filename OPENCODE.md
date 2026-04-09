@@ -23,7 +23,7 @@ Key highlights:
 
 **NVIDIA-SMI Snapshot (model fully loaded and running):**
 
-```bash
+``` bash
 +-----------------------------------------------------------------------------------------+
 | NVIDIA-SMI 580.126.09 Driver Version: 580.126.09 CUDA Version: 13.0                    |
 +-----------------------------------------+------------------------+----------------------+
@@ -143,7 +143,7 @@ This setup keeps long coding sessions manageable without losing too much history
 The Hermes toolchain (from Nous Research) provides robust tool-calling support and was the missing piece that resolved repeated query failures.
 
 - Installation:
-```bash
+``` bash
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 ```
 
