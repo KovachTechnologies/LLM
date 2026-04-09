@@ -143,7 +143,7 @@ This setup keeps long coding sessions manageable without losing too much history
 The Hermes toolchain (from Nous Research) provides robust tool-calling support and was the missing piece that resolved repeated query failures.
 
 - Installation:
-```bash
+``` bash
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 ```
 
