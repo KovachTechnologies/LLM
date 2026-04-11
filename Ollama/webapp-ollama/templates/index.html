@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squawk AI • Dual Nvidia 5060 16GB Rig</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .chat-bubble-user { border-bottom-right-radius: 4px; }
+        .chat-bubble-assistant { border-bottom-left-radius: 4px; }
+        .message-container::-webkit-scrollbar { display: none; }
+        .thinking-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+        .animation-delay-150 { animation-delay: 0.15s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white">
+    <div class="flex h-screen flex-col">
+        <!-- HEADER -->
+        <div class="border-b border-zinc-800 bg-zinc-900 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center text-2xl">
+                    <svg class="logo" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" width="32" height="32" style="max-width: 100%; max-height: 100%;">
+                        <rect width="400" height="400" fill="#121212" fill-opacity="0"/>
+                        <path d="M280 180 L310 160 L300 200 Z" fill="#FF1744"/>
+                        <path d="M280 180 L320 190 L305 200 Z" fill="#FF1744"/>
+                        <path d="M200 320 C150 320 100 280 100 220 C100 160 140 120 180 110 L200 100 L220 110 C260 120 300 160 300 220 C300 280 250 320 200 320 Z" fill="#121212" stroke="#FBFF00" stroke-width="16"/>
+                        <circle cx="220" cy="160" r="20" fill="#FFFFFF"/>
+                        <circle cx="225" cy="155" r="8" fill="#121212"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-tight">Squawk AI</h1>
+                    <p class="text-xs text-zinc-400">Local AI chat interface • 127.0.0.1:11434</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-6">
+                <!-- Current model display -->
+                <div id="model-display" onclick="refreshModel()" 
+                     class="flex items-center gap-x-2 bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-3xl cursor-pointer transition-colors">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span id="model-name" class="text-sm font-medium text-emerald-300">Detecting model...</span>
+                </div>
+                
+                <button onclick="clearChat()" 
+                        class="flex items-center gap-x-2 px-5 py-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-3xl transition-colors text-sm font-medium">
+                    <span class="text-lg">⟳</span>
+                    CLEAR CHAT
+                </button>
+            </div>
+        </div>
+
+        <!-- CHAT WINDOW -->
+        <div id="chat-window" class="message-container flex-1 overflow-y-auto px-6 py-8 space-y-8 bg-[radial-gradient(#27272a_1px,transparent_1px)] bg-[length:40px_40px]">
+            <!-- Messages are injected here via JS -->
+            <div class="flex flex-col items-center justify-center h-full text-center opacity-40" id="welcome-screen">
+                <div class="text-6xl mb-6">🤖</div>
+                <h2 class="text-3xl font-semibold mb-2">Ready to chat with Squawk AI</h2>
+                <p class="max-w-md text-zinc-400">Your local model is automatically detected.<br>Upload TXT, PDF, or Word docs and start asking questions.</p>
+            </div>
+        </div>
+
+        <!-- INPUT BAR -->
+        <div class="border-t border-zinc-800 bg-zinc-900 p-4 sticky bottom-0">
+            <form id="chat-form" class="max-w-4xl mx-auto">
+                <div class="flex items-end gap-x-3 bg-zinc-800 rounded-3xl p-2 shadow-inner">
+                    
+                    <!-- File upload button -->
+                    <label onclick="document.getElementById('file-input').click()" 
+                           class="flex h-11 w-11 items-center justify-center hover:bg-zinc-700 rounded-2xl cursor-pointer transition-colors flex-shrink-0">
+                        <input id="file-input" type="file" accept=".txt,.pdf,.doc,.docx" class="hidden">
+                        <span class="text-2xl">📎</span>
+                    </label>
+
+                    <!-- Text input -->
+                    <input id="message-input" 
+                           type="text"
+                           placeholder="Message your local Ollama model..."
+                           class="flex-1 bg-transparent px-5 py-3 outline-none text-lg placeholder-zinc-400">
+
+                    <!-- Send button -->
+                    <button type="submit"
+                            class="h-11 w-11 flex items-center justify-center bg-blue-600 hover:bg-blue-500 rounded-2xl transition-all active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.874L5.999 12zm0 0h7.07" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- File name preview (if attached) -->
+                <div id="file-preview" class="hidden mt-3 text-xs text-zinc-400 flex items-center gap-x-2 px-5">
+                    <span class="bg-zinc-700 px-3 py-1 rounded-2xl flex items-center">
+                        📄 <span id="filename-display" class="ml-2"></span>
+                    </span>
+                    <span onclick="clearFile()" class="cursor-pointer hover:text-red-400">✕</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let conversation = []           // full history sent to Ollama
+        let currentAssistantElement = null
+        let currentFile = null
+
+        const chatWindow = document.getElementById('chat-window')
+        const form = document.getElementById('chat-form')
+        const messageInput = document.getElementById('message-input')
+        const fileInput = document.getElementById('file-input')
+        const filePreview = document.getElementById('file-preview')
+        const filenameDisplay = document.getElementById('filename-display')
+        const modelNameEl = document.getElementById('model-name')
+
+        // Auto-detect running model
+        async function loadCurrentModel() {
+            try {
+                const res = await fetch('/current_model')
+                const data = await res.json()
+                if (data.model) {
+                    modelNameEl.textContent = data.model
+                    modelNameEl.parentElement.classList.add('!bg-emerald-950', '!text-emerald-300')
+                } else {
+                    modelNameEl.textContent = 'No model running — run "ollama run <model>"'
+                    modelNameEl.parentElement.classList.add('!bg-amber-950', '!text-amber-300')
+                }
+            } catch (e) {
+                console.error('Error loading model:', e)
+                modelNameEl.textContent = 'Ollama unreachable'
+                modelNameEl.parentElement.classList.add('!bg-red-950', '!text-red-300')
+            }
+        }
+
+        function refreshModel() {
+            loadCurrentModel()
+        }
+
+        // Add message to UI
+        function addMessage(role, content) {
+            const isUser = role === 'user'
+            
+            // Hide welcome screen on first message
+            if (document.getElementById('welcome-screen') && conversation.length === 0) {
+                document.getElementById('welcome-screen').remove()
+            }
+            
+            const wrapper = document.createElement('div')
+            wrapper.className = `flex ${isUser ? 'justify-end' : 'justify-start'} group`
+            
+            const bubble = document.createElement('div')
+            bubble.className = `max-w-[75%] px-6 py-4 rounded-3xl text-base leading-relaxed ${
+                isUser 
+                    ? 'bg-blue-600 text-white chat-bubble-user' 
+                    : 'bg-zinc-800 text-white chat-bubble-assistant'
+            }`
+            
+            const text = document.createElement('p')
+            text.className = 'whitespace-pre-wrap break-words'
+            text.textContent = content
+            bubble.appendChild(text)
+            
+            // Copy button (only for assistant)
+            if (!isUser) {
+                const copyBtn = document.createElement('button')
+                copyBtn.className = 'mt-3 text-xs flex items-center gap-x-1 text-zinc-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity'
+                copyBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16v-4m4 4v4m-8-8h8a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                    </svg>
+                    Copy
+                `
+                copyBtn.onclick = (e) => {
+                    e.stopImmediatePropagation()
+                    navigator.clipboard.writeText(content).then(() => {
+                        const originalText = copyBtn.innerHTML
+                        copyBtn.textContent = 'Copied!'
+                        setTimeout(() => { copyBtn.innerHTML = originalText }, 2000)
+                    })
+                }
+                bubble.appendChild(copyBtn)
+            }
+            
+            wrapper.appendChild(bubble)
+            chatWindow.appendChild(wrapper)
+            
+            // Scroll to bottom
+            chatWindow.scrollTop = chatWindow.scrollHeight
+        }
+
+        // Show thinking animation
+        function showThinking() {
+            const wrapper = document.createElement('div')
+            wrapper.className = 'flex justify-start'
+            wrapper.id = 'thinking-wrapper'
+            wrapper.innerHTML = `
+                <div class="bg-zinc-800 px-6 py-4 rounded-3xl flex items-center gap-x-3">
+                <div class="flex gap-x-1">
+                    <div class="thinking-dots w-2 h-2 bg-blue-400 rounded-full"></div>
+                    <div class="thinking-dots w-2 h-2 bg-blue-400 rounded-full animation-delay-150"></div>
+                    <div class="thinking-dots w-2 h-2 bg-blue-400 rounded-full animation-delay-300"></div>
+                </div>
+                <span class="text-zinc-400 font-medium">Thinking...</span>
+                </div>
+            `
+            chatWindow.appendChild(wrapper)
+            chatWindow.scrollTop = chatWindow.scrollHeight
+            return wrapper
+        }
+
+        // Stream handler
+        async function streamResponse(formData) {
+            const thinking = showThinking()
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    body: formData
+                })
+                
+                if (!response.ok) throw new Error('Ollama returned error')
+                
+                // Remove thinking indicator
+                thinking.remove()
+                
+                // Create permanent assistant bubble
+                const wrapper = document.createElement('div')
+                wrapper.className = 'flex justify-start'
+                const bubble = document.createElement('div')
+                bubble.className = 'max-w-[75%] px-6 py-4 rounded-3xl bg-zinc-800 text-white chat-bubble-assistant'
+                const contentEl = document.createElement('p')
+                contentEl.className = 'whitespace-pre-wrap break-words'
+                bubble.appendChild(contentEl)
+                wrapper.appendChild(bubble)
+                chatWindow.appendChild(wrapper)
+                
+                let fullText = ''
+                
+                const reader = response.body.getReader()
+                const decoder = new TextDecoder()
+                
+                while (true) {
+                    const { value, done } = await reader.read()
+                    if (done) break
+                    
+                    const chunk = decoder.decode(value)
+                    // Ollama streaming returns text directly, not with "data: " prefix
+                    if (chunk) {
+                        fullText += chunk
+                        contentEl.textContent = fullText
+                        chatWindow.scrollTop = chatWindow.scrollHeight
+                    }
+                }
+                
+                // Add copy button once streaming finishes
+                const copyBtn = document.createElement('button')
+                copyBtn.className = 'mt-3 text-xs flex items-center gap-x-1 text-zinc-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity'
+                copyBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16v-4m4 4v4m-8-8h8a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                    </svg>
+                    Copy
+                `
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(fullText).then(() => {
+                        copyBtn.innerHTML = `✅ Copied!`
+                        setTimeout(() => copyBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16v-4m4 4v4m-8-8h8a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                            </svg>
+                            Copy`, 1800)
+                    })
+                }
+                bubble.appendChild(copyBtn)
+                
+                // Save to conversation history
+                conversation.push({ role: 'assistant', content: fullText })
+                
+            } catch (err) {
+                thinking.remove()
+                const errorMsg = document.createElement('div')
+                errorMsg.className = 'flex justify-start'
+                errorMsg.innerHTML = `<div class="bg-red-950 text-red-300 px-6 py-4 rounded-3xl">Error: ${err.message}</div>`
+                chatWindow.appendChild(errorMsg)
+                chatWindow.scrollTop = chatWindow.scrollHeight
+            }
+        }
+
+        // Send message
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            
+            const userText = messageInput.value.trim()
+            const hasFile = fileInput.files.length > 0
+            
+            if (!userText && !hasFile) return
+            
+            // Add user message immediately
+            if (userText) {
+                addMessage('user', userText)
+                conversation.push({ role: 'user', content: userText })
+            }
+            
+            // Prepare FormData for backend (messages + optional file)
+            const formData = new FormData()
+            formData.append('messages', JSON.stringify(conversation))
+            
+            if (hasFile) {
+                formData.append('file', fileInput.files[0])
+                // Show preview
+                filenameDisplay.textContent = fileInput.files[0].name
+                filePreview.classList.remove('hidden')
+                currentFile = fileInput.files[0]
+            }
+            
+            messageInput.value = ''
+            
+            // Send to backend
+            await streamResponse(formData)
+            
+            // Clear file input
+            fileInput.value = ''
+            filePreview.classList.add('hidden')
+        })
+
+        function clearFile() {
+            fileInput.value = ''
+            filePreview.classList.add('hidden')
+        }
+
+        function clearChat() {
+            if (confirm('Clear entire conversation?')) {
+                conversation = []
+                chatWindow.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center opacity-40" id="welcome-screen">
+                        <div class="text-6xl mb-6">🤖</div>
+                        <h2 class="text-3xl font-semibold mb-2">Ready to chat with Ollama</h2>
+                        <p class="max-w-md text-zinc-400">Your local model is automatically detected.<br>Upload TXT, PDF, or Word docs and start asking questions.</p>
+                    </div>`
+            }
+        }
+
+        // Boot the UI
+        window.onload = () => {
+            loadCurrentModel()
+            // Keyboard shortcut: Ctrl/Cmd + K to focus input
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault()
+                    messageInput.focus()
+                }
+            })
+        }
+    </script>
+</body>
+</html>
