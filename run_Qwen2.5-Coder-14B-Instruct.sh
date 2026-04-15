@@ -14,4 +14,4 @@ export FLASHINFER_DISABLE=1                       # Completely skip FlashInfer J
 export VLLM_DISABLE_FLASHINFER_PREFILL=1          # Extra safety
 
 # Optimized for Qwen2.5-Coder-14B AWQ on 2x16GB
-vllm serve Qwen/Qwen2.5-Coder-14B-Instruct-AWQ --quantization awq --enforce-eager --dtype float16 --tensor-parallel-size 2 --gpu-memory-utilization 0.92 --cpu-offload-gb 4 --max-model-len 32768 --max-num-batched-tokens 16384 --disable-custom-all-reduce --enable-auto-tool-choice --tool-call-parser hermes --chat-template-content-format string --port 8000
+vllm serve Qwen/Qwen2.5-Coder-14B-Instruct-AWQ --quantization awq --enforce-eager --dtype float16 --tensor-parallel-size 2 --gpu-memory-utilization 0.92 --cpu-offload-gb 4 --max-model-len 32768 --max-num-batched-tokens 16384 --disable-custom-all-reduce --enable-auto-tool-choice --tool-call-parser qwen --chat-template-content-format openai --port 8000
